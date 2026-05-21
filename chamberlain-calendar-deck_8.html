@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>John Chamberlain - 2027 Centennial Program</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --gray: #888; --light: #e0e0e0; }
+
+html, body { width:100%; height:100%; background:#fff; color:#000; font-family:'Inter',sans-serif; overflow:hidden; }
+
+.slides { width:100vw; height:100vh; position:relative; }
+.slide { position:absolute; inset:0; opacity:0; pointer-events:none; transition:opacity .35s ease; background:#fff; display:flex; flex-direction:column; }
+.slide.active { opacity:1; pointer-events:all; }
+
+/* Footer */
+.slide-footer { flex-shrink:0; height:52px; padding:0 48px; display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--light); }
+.footer-credit { font-size:12px; }
+.footer-nav { display:flex; gap:8px; }
+.nav-btn { background:none; border:1px solid var(--light); color:#000; font-family:'Inter',sans-serif; font-size:11px; font-weight:500; padding:5px 12px; cursor:pointer; transition:border-color .15s; }
+.nav-btn:hover { border-color:#000; }
+.footer-num { font-size:12px; min-width:40px; text-align:right; }
+
+/* Progress */
+.progress { position:fixed; top:0; left:0; height:2px; background:#000; transition:width .4s ease; z-index:200; pointer-events:none; }
+
+/* Shared body */
+.slide-body { flex:1; overflow:hidden; padding:40px 48px 20px; }
+.eyebrow  { font-size:12px; font-weight:700; margin-bottom:10px; }
+.rule     { width:100%; height:1px; background:#000; margin-bottom:22px; }
+.body-large { font-size:clamp(17px,1.9vw,26px); font-weight:400; line-height:1.35; margin-bottom:20px; }
+.body-reg   { font-size:clamp(12px,1vw,14px); font-weight:400; line-height:1.65; margin-bottom:14px; }
+
+/* ── COVER ── */
+#s0 .slide-body { display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+.cover-title { font-size:clamp(44px,6.5vw,90px); font-weight:700; letter-spacing:-.025em; line-height:1.0; margin-bottom:22px; }
+.cover-sub   { font-size:15px; line-height:1.6; }
+
+/* ── PHILOSOPHY ── */
+#s1 .slide-body { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:start; }
+.principle-list { display:flex; flex-direction:column; }
+.principle-item { display:grid; grid-template-columns:16px 1fr; gap:12px; padding:13px 0; border-bottom:1px solid var(--light); }
+.principle-item:first-child { border-top:1px solid var(--light); }
+.p-num  { font-size:11px; color:var(--gray); padding-top:2px; }
+.p-text { font-size:13px; line-height:1.65; }
+.p-text strong { font-weight:700; }
+
+/* ── CALENDAR OVERVIEW ── */
+#s2 .slide-body { display:flex; flex-direction:column; padding-top:32px; }
+#s2 .eyebrow { margin-bottom:6px; }
+.cal-head { font-size:clamp(22px,2.6vw,40px); font-weight:700; letter-spacing:-.02em; line-height:1.1; margin-bottom:12px; }
+
+.quarter-grid {
+  display:grid;
+  grid-template-columns:80px 1fr 1fr 1fr 1fr;
+  border-top:1px solid #000;
+  border-left:1px solid #000;
+  flex:1;
+}
+.qg-blank, .qg-qhead {
+  border-right:1px solid #000;
+  border-bottom:1px solid #000;
+  padding:9px 11px;
+  font-size:11px; font-weight:700;
+}
+.qg-qhead .qg-months { font-size:9px; font-weight:400; color:var(--gray); margin-top:2px; }
+.qg-qhead.centennial { background:#f8f5ee; }
+
+.qg-tlabel {
+  border-right:1px solid #000;
+  border-bottom:1px solid var(--light);
+  padding:10px 10px;
+  font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  display:flex; align-items:center;
+}
+.qg-tlabel.last { border-bottom:1px solid #000; }
+
+.qg-cell {
+  border-right:1px solid #000;
+  border-bottom:1px solid var(--light);
+  padding:9px 11px;
+}
+.qg-cell.last { border-bottom:1px solid #000; }
+.qg-cell-name   { font-size:11px; font-weight:700; line-height:1.3; }
+.qg-cell-detail { font-size:9px; color:var(--gray); line-height:1.5; margin-top:3px; }
+
+.cal-legend { display:flex; gap:20px; margin-top:10px; align-items:center; flex-wrap:wrap; }
+.leg-item { display:flex; gap:6px; align-items:center; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.leg-swatch { width:10px; height:10px; border:1px solid #000; flex-shrink:0; }
+.leg-swatch.creator { background:#000; }
+.leg-swatch.halo    { background:#fff; }
+.leg-swatch.access  { background:#ccc; border-color:#ccc; }
+.leg-swatch.story   { background:#f0f0f0; border-color:#ccc; }
+
+/* ── QUARTER SLIDES ── */
+.q-slide-body {
+  flex:1; overflow:hidden;
+  padding:30px 48px 14px;
+  display:flex; flex-direction:column;
+}
+.q-header { flex-shrink:0; }
+.q-label  { font-size:12px; font-weight:700; margin-bottom:8px; }
+.q-head   { font-size:clamp(17px,1.9vw,28px); font-weight:700; letter-spacing:-.02em; line-height:1.1; margin-bottom:2px; }
+.q-subhead{ font-size:10px; color:var(--gray); margin-top:4px; letter-spacing:.02em; }
+
+/* 4 tier rows share available height equally */
+.tier-rows {
+  display:flex; flex-direction:column;
+  flex:1; min-height:0;
+  margin-top:12px;
+  border:1px solid #000;
+  border-bottom:none;
+}
+.tier-row {
+  display:grid;
+  grid-template-columns:80px 1fr 1fr 120px;
+  flex:1; min-height:0;
+  border-bottom:1px solid #000;
+}
+
+/* Tier name column */
+.tier-name-col {
+  padding:10px 10px;
+  border-right:1px solid #000;
+  display:flex; flex-direction:column; gap:5px;
+  overflow:hidden;
+}
+.tier-badge {
+  font-size:8px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  border:1px solid #000; padding:2px 6px; align-self:flex-start;
+  white-space:nowrap; display:inline-block;
+}
+.tier-badge.creator { background:#000; color:#fff; border-color:#000; }
+.tier-badge.halo    { background:#fff; color:#000; border-color:#000; }
+.tier-badge.access  { background:#ccc; color:#000; border-color:#ccc; }
+.tier-badge.story   { background:#f0f0f0; color:#000; border-color:var(--light); }
+.tier-def { font-size:9px; color:var(--gray); line-height:1.45; }
+
+/* Content columns */
+.tier-main-col {
+  padding:10px 16px;
+  border-right:1px solid var(--light);
+  display:flex; flex-direction:column;
+  overflow:hidden; min-height:0;
+}
+.tier-why-col {
+  padding:10px 16px;
+  border-right:1px solid var(--light);
+  display:flex; flex-direction:column;
+  overflow:hidden; min-height:0;
+}
+.tier-timing-col {
+  padding:10px 10px;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+
+.tp-name     { font-size:clamp(12px,1.3vw,18px); font-weight:700; letter-spacing:-.01em; line-height:1.15; }
+.tp-name-sub { font-size:9px; color:var(--gray); margin-top:1px; margin-bottom:3px; }
+.tp-col-label { font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--gray); margin-top:6px; margin-bottom:3px; }
+.tp-col-label:first-of-type { margin-top:4px; }
+.tp-text  { font-size:10.5px; line-height:1.6; color:#333; }
+.tp-text.dark { color:#000; }
+
+/* ── CLOSING ── */
+#s7 .slide-body { display:flex; flex-direction:column; justify-content:center; }
+.closing-quote { font-size:clamp(22px,2.8vw,44px); font-weight:400; line-height:1.2; margin-bottom:14px; max-width:860px; }
+.closing-attr  { font-size:11px; color:var(--gray); letter-spacing:.05em; margin-bottom:28px; }
+.closing-body  { font-size:13px; line-height:1.8; color:var(--gray); max-width:580px; margin-bottom:28px; }
+.closing-table { width:100%; border-top:1px solid #000; }
+.c-row { display:grid; grid-template-columns:60px 1fr; gap:20px; padding:9px 0; border-bottom:1px solid var(--light); align-items:baseline; }
+.c-row:last-child { border-bottom:1px solid #000; }
+.c-q   { font-size:11px; font-weight:700; }
+.c-text{ font-size:11px; color:var(--gray); line-height:1.7; }
+
+/* ── MOBILE ── */
+@media (max-width:767px) {
+  html, body { overflow:auto !important; height:auto !important; }
+  .progress { display:none; }
+  .slides { position:static !important; width:100% !important; height:auto !important; display:flex; flex-direction:column; }
+  .slide { position:static !important; opacity:1 !important; pointer-events:all !important; width:100% !important; height:auto !important; display:flex !important; flex-direction:column !important; border-bottom:2px solid #000; }
+  .slide-body, .q-slide-body { flex:none !important; height:auto !important; overflow:visible !important; padding:28px 24px 32px !important; display:block !important; }
+  .slide-footer { padding:14px 24px !important; height:auto !important; }
+  .footer-nav { display:none !important; }
+  #s0 .slide-body { display:flex !important; flex-direction:column !important; justify-content:center !important; align-items:center !important; text-align:center !important; min-height:80vh !important; }
+  .cover-title { font-size:40px !important; margin-bottom:16px !important; }
+  #s1 .slide-body { display:flex !important; flex-direction:column !important; gap:24px !important; }
+  .quarter-grid { overflow-x:auto; font-size:9px; }
+  .tier-rows { border:none !important; gap:12px; }
+  .tier-row { display:flex !important; flex-direction:column !important; flex:none !important; border:1px solid var(--light) !important; padding:14px; }
+  .tier-name-col, .tier-main-col, .tier-why-col, .tier-timing-col { border:none !important; padding:6px 0 !important; }
+  .tier-name-col { border-bottom:1px solid var(--light) !important; padding-bottom:10px !important; }
+  #s7 .slide-body { min-height:60vh !important; }
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="slides">
+
+<!-- ═══════════════════════════════════
+     SLIDE 0: COVER
+═══════════════════════════════════ -->
+<div class="slide active" id="s0">
+  <div class="slide-body">
+    <div class="cover-title">John Chamberlain</div>
+    <div class="cover-sub">
+      2027 Centennial Program - An Annualized Collaboration Framework<br>
+      Initial Concepting: Release Calendar Strategy - Prepared 2026
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span class="footer-credit">Prepared by temporary.company</span>
+    <span class="footer-nav"><button class="nav-btn" onclick="changeSlide(-1)">← Prev</button><button class="nav-btn" onclick="changeSlide(1)">Next →</button></span>
+    <span class="footer-num">1 / 8</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 1: PHILOSOPHY
+═══════════════════════════════════ -->
+<div class="slide" id="s1">
+  <div class="slide-body">
+    <div>
+      <div class="eyebrow">The Approach</div>
+      <div class="rule"></div>
+      <p class="body-large">Cultural relevance over price point.</p>
+      <p class="body-reg">The most significant expansion of Chamberlain's audience will not come through institutional channels alone. It will come through the objects, garments, and cultural moments that already structure the daily lives of the people we want to reach.</p>
+      <p class="body-reg">Each partnership is distributed across 2027 to sustain momentum - reintroducing the work to a new audience with each drop, grounded in a formal or material connection to Chamberlain's practice.</p>
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px">Four Tiers</div>
+      <div class="rule"></div>
+      <div class="principle-list">
+        <div class="principle-item">
+          <span class="p-num">—</span>
+          <span class="p-text"><strong>Creator.</strong> Artists and studios whose practice is in genuine dialogue with Chamberlain's - brought in as collaborators rather than licensees. These partnerships generate the most culturally resonant work and the most durable press.</span>
+        </div>
+        <div class="principle-item">
+          <span class="p-num">—</span>
+          <span class="p-text"><strong>Halo.</strong> Prestigious, high-visibility moments that anchor the centennial institutionally. These are the drops and events that set the tone and generate sustained conversation - the events everything else orbits.</span>
+        </div>
+        <div class="principle-item">
+          <span class="p-num">—</span>
+          <span class="p-text"><strong>Accessible.</strong> Broad-reach collaborations that bring the work to new and younger audiences across a range of price points. These create familiarity and establish Chamberlain as a living cultural reference.</span>
+        </div>
+        <div class="principle-item">
+          <span class="p-num">—</span>
+          <span class="p-text"><strong>Story.</strong> Narrative-first partnerships that prioritize storytelling and cultural context over product. These generate the editorial layer that gives the entire program depth - the "why it matters" that makes the other tiers land.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span class="footer-credit">Prepared by temporary.company</span>
+    <span class="footer-nav"><button class="nav-btn" onclick="changeSlide(-1)">← Prev</button><button class="nav-btn" onclick="changeSlide(1)">Next →</button></span>
+    <span class="footer-num">2 / 8</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 2: CALENDAR OVERVIEW
+═══════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="slide-body">
+    <div class="eyebrow">2027 Program Overview</div>
+    <div class="cal-head">Four quarters. Four tiers. One centennial.</div>
+    <div class="quarter-grid">
+      <!-- Header -->
+      <div class="qg-blank"></div>
+      <div class="qg-qhead"><div>Q1</div><div class="qg-months">Jan - Mar 2027</div></div>
+      <div class="qg-qhead centennial"><div>Q2 ★</div><div class="qg-months">Apr - Jun 2027 · Centennial</div></div>
+      <div class="qg-qhead"><div>Q3</div><div class="qg-months">Jul - Sep 2027</div></div>
+      <div class="qg-qhead"><div>Q4</div><div class="qg-months">Oct - Dec 2027</div></div>
+      <!-- Creator -->
+      <div class="qg-tlabel">Creator</div>
+      <div class="qg-cell"><div class="qg-cell-name">Playlab</div><div class="qg-cell-detail">Centennial activation - creative direction for the program's defining cultural moment</div></div>
+      <div class="qg-cell"><div class="qg-cell-name">Sterling Ruby</div><div class="qg-cell-detail">Creator collaboration - reinterpretation of Chamberlain's formal and material language through Ruby's multidisciplinary practice</div></div>
+      <div class="qg-cell"><div class="qg-cell-name">Samuel Ross / SR_A</div><div class="qg-cell-detail">Sculptural reinterpretation in dialogue with Chamberlain's material language</div></div>
+      <div class="qg-cell"><div class="qg-cell-name">Bentley</div><div class="qg-cell-detail">Limited bespoke commission - centennial vehicle and object pairing</div></div>
+      <!-- Halo -->
+      <div class="qg-tlabel">Halo</div>
+      <div class="qg-cell"><div class="qg-cell-name">Rimowa</div><div class="qg-cell-detail">Limited aluminum case edition - metal-to-metal material storytelling</div></div>
+      <div class="qg-cell"><div class="qg-cell-name">Alessi</div><div class="qg-cell-detail">Limited artist object series - steel home objects referencing Chamberlain's formal language</div></div>
+      <div class="qg-cell"><div class="qg-cell-name">Tiffany &amp; Co.</div><div class="qg-cell-detail">Silver jewelry edition - sculptural forms referencing Chamberlain's compressed metalwork</div></div>
+      <div class="qg-cell"><div class="qg-cell-name">Hot Wheels</div><div class="qg-cell-detail">Mattel Creations centennial collector series - holiday die-cast edition</div></div>
+      <!-- Accessible -->
+      <div class="qg-tlabel">Accessible</div>
+      <div class="qg-cell"><div class="qg-cell-name">Supreme</div><div class="qg-cell-detail">Centennial capsule - tee, hoodie, skate deck at Supreme stores and DSM</div></div>
+      <div class="qg-cell"><div class="qg-cell-name">424</div><div class="qg-cell-detail">LA-based streetwear - centennial capsule bridging fine art and contemporary fashion</div></div>
+      <div class="qg-cell"><div class="qg-cell-name">Hidden NY</div><div class="qg-cell-detail">Discovery-first web drop with editorial - storytelling and product for the next-gen collector</div></div>
+      <div class="qg-cell"><div class="qg-cell-name">Uniqlo UT</div><div class="qg-cell-detail">Global graphic tee program across 2,400+ stores worldwide</div></div>
+      <!-- Story -->
+      <div class="qg-tlabel last">Story</div>
+      <div class="qg-cell last"><div class="qg-cell-name">FAT Racing</div><div class="qg-cell-detail">GP Ice Race activation - Chamberlain centennial as part of FAT's automotive culture event</div></div>
+      <div class="qg-cell last"><div class="qg-cell-name">VCARB / Racing Bulls F1</div><div class="qg-cell-detail">Content program - American steel from Chamberlain's studio to the F1 pit lane</div></div>
+      <div class="qg-cell last"><div class="qg-cell-name">Cart Dept.</div><div class="qg-cell-detail">Archival storytelling partnership for the next-gen collector audience</div></div>
+      <div class="qg-cell last"><div class="qg-cell-name">Design Miami</div><div class="qg-cell-detail">Year-end capstone at the definitive design and collecting fair</div></div>
+    </div>
+    <div class="cal-legend">
+      <div class="leg-item"><div class="leg-swatch creator"></div>Creator</div>
+      <div class="leg-item"><div class="leg-swatch halo"></div>Halo</div>
+      <div class="leg-item"><div class="leg-swatch access"></div>Accessible</div>
+      <div class="leg-item"><div class="leg-swatch story"></div>Story</div>
+      <span style="font-size:10px;color:var(--gray);margin-left:8px">★ April 16, 2027 — Centennial of Chamberlain's birth</span>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span class="footer-credit">Prepared by temporary.company</span>
+    <span class="footer-nav"><button class="nav-btn" onclick="changeSlide(-1)">← Prev</button><button class="nav-btn" onclick="changeSlide(1)">Next →</button></span>
+    <span class="footer-num">3 / 8</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 3: Q1
+═══════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="q-slide-body">
+    <div class="q-header">
+      <div class="q-label">Q1 — January through March 2027</div>
+      <div class="rule"></div>
+      <div class="q-head">Setting the tone before the centennial arrives.</div>
+      <div class="q-subhead">Playlab (Creator) &nbsp;&middot;&nbsp; Rimowa (Halo) &nbsp;&middot;&nbsp; Supreme (Accessible) &nbsp;&middot;&nbsp; FAT Racing (Story)</div>
+    </div>
+    <div class="tier-rows">
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge creator">Creator</div>
+          <div class="tier-def">Artist collaboration. The centennial's cultural proposition.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Playlab</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">Playlab serves as creative engine behind the centennial's major activation - an installation, publication, or experiential moment that sets the aesthetic and editorial tone for the entire year. Not just a product; a cultural proposition.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">LA-based multidisciplinary studio (Archie Lee Coates IV and Jeff Franklin). Designed Louis Vuitton runway shows for Virgil Abloh, collaborated with Alessi, Rimowa, Nike, and Adidas. Process-driven and ideas-first - exactly right for a centennial moment that should feel unexpected rather than institutional.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">Q1 2027<br>Launch activation</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge halo">Halo</div>
+          <div class="tier-def">Prestige. High-visibility institutional anchor.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Rimowa</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">Limited aluminum case edition with a full editorial campaign - material storytelling about worked metal, compression, and the formal language shared between Chamberlain's crushed steel and Rimowa's grooved aluminum shell.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Rimowa's artist collaboration history includes Virgil Abloh, Supreme, Daniel Arsham (eroded suitcase series), Alex Israel, and Dior. LVMH-owned and collector-minded. Arsham's Rimowa work - including an "eroded suitcase" numbered series - establishes a direct precedent for sculptural object thinking applied to travel goods.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">Q1 2027<br>Editorial and retail launch</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge access">Accessible</div>
+          <div class="tier-def">Broad reach. New audiences. Multiple price points.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Supreme</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">Centennial capsule - tee, hoodie, and skate deck featuring archival Chamberlain imagery. Limited run at Supreme standalone stores and DSM shop-in-shop, driving heat on the secondary market.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">The defining institution of artist-apparel collaboration. Prior programs with Basquiat and Haring estates prove Supreme treats legacy partnerships with rigor. Their collector audience generates secondary market momentum that sustains cultural conversation long after the drop.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">Q1 2027<br>Ahead of centennial</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge story">Story</div>
+          <div class="tier-def">Narrative first. Cultural context. Event-driven.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">FAT Racing</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">A centennial activation at or around FAT International's GP Ice Race - a Chamberlain-themed presence at one of automotive culture's most culturally sophisticated events. More culturally resonant than the St. Moritz Ice Race circuit; FAT's audience is younger, more design-literate, and deeply community-driven.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">FAT International was founded by Ferdinand "Ferdi" Porsche (grandson of the company founder). The GP Ice Race brings together fashion, art, music, and motorsport in a way few events do. Chamberlain's automotive steel origins make this a genuinely earned presence - not a brand placement but a natural cultural alignment between two practices rooted in the material culture of the car.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">Feb / Mar 2027<br>GP Ice Race season</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span class="footer-credit">Prepared by temporary.company</span>
+    <span class="footer-nav"><button class="nav-btn" onclick="changeSlide(-1)">← Prev</button><button class="nav-btn" onclick="changeSlide(1)">Next →</button></span>
+    <span class="footer-num">4 / 8</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 4: Q2
+═══════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="q-slide-body">
+    <div class="q-header">
+      <div class="q-label">Q2 — April through June 2027 ★ Centennial</div>
+      <div class="rule"></div>
+      <div class="q-head">April 16, 2027. The centennial itself.</div>
+      <div class="q-subhead">Sterling Ruby (Creator) &nbsp;&middot;&nbsp; Alessi (Halo) &nbsp;&middot;&nbsp; 424 (Accessible) &nbsp;&middot;&nbsp; VCARB / Racing Bulls F1 (Story)</div>
+    </div>
+    <div class="tier-rows">
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge creator">Creator</div>
+          <div class="tier-def">Artist reinterpretation. The centennial's most formally resonant collaboration.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Sterling Ruby</div>
+          <div class="tp-name-sub">S.R. STUDIO. LA. CA. — Los Angeles</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">A centennial collaboration in which Ruby reinterprets Chamberlain's formal and material language through his own practice - sculpture, textile, ceramics, or painting - creating new work in genuine dialogue with Chamberlain's output rather than simply licensing it.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Ruby's monumental metal sculptures recall industrial machine parts; his "illicit mergers" of disparate materials directly echo Chamberlain's formal logic. Both engage American material culture at scale. His clothing line S.R. STUDIO. LA. CA. (debuted Pitti Uomo 2019) gives this Creator collaboration natural product extensions.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">April 2027<br>Centennial week</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge halo">Halo</div>
+          <div class="tier-def">Prestige object. The centennial's defining design artifact.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Alessi</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">Limited artist object series - steel and chrome home objects designed in dialogue with Chamberlain's formal language of crumple, compression, and unexpected beauty. Chamberlain's painted steel masks are a natural application for Alessi's corkscrew and tabletop object language. Edition of 999.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Alessi has produced limited-edition artist objects since the 1970s - from Ettore Sottsass to Virgil Abloh (edition sold through instantly, now in MoMA's permanent collection). Their design-literate collector audience is precisely the audience for whom the centennial should carry weight. The material overlap is direct: both practices center highly finished metal objects that are simultaneously functional and contemplative.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">April 2027<br>Centennial week</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge access">Accessible</div>
+          <div class="tier-def">LA streetwear credibility. Fine art meets fashion.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">424</div>
+          <div class="tp-name-sub">Guillermo Andrade — Los Angeles, Est. 2015</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">A centennial capsule grounded in Chamberlain's material practice - hand-finished garments in steel-toned palettes with abstract painted details referencing the sculpture's surface and process. A collaboration that treats apparel as an extension of the artist's formal language, not merely a graphic application.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Guillermo Andrade's 424 sits at the intersection of fine art and streetwear - sold at SSENSE, Selfridges, and GR8 Tokyo. His collections have tackled police brutality, immigration, and American identity: the same territory Chamberlain's practice occupies. 424 is deeply rooted in Los Angeles and a specifically American material and cultural experience. This is the most conceptually coherent apparel collaboration in the program.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">April / May 2027<br>Miami Art Week / centennial</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge story">Story</div>
+          <div class="tier-def">Content program. The narrative behind the livery.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">VCARB / Racing Bulls</div>
+          <div class="tp-name-sub">Content Program</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">The F1 partnership extends beyond the livery into a full content program - the story of American steel from Chamberlain's studio to the F1 pit lane. Short-form video, archival imagery, and editorial distributed through VCARB's channels and the estate's platforms simultaneously.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">VCARB's Creator Platform provides built-in distribution infrastructure reaching F1's global digital audience - young, design-literate, and culturally curious. The content turns the livery from a one-day visual into a weeks-long conversation that far outlasts the race weekend, generating organic reach across platforms the estate cannot access alone.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">April - June 2027<br>Around Miami GP</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span class="footer-credit">Prepared by temporary.company</span>
+    <span class="footer-nav"><button class="nav-btn" onclick="changeSlide(-1)">← Prev</button><button class="nav-btn" onclick="changeSlide(1)">Next →</button></span>
+    <span class="footer-num">5 / 8</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 5: Q3
+═══════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="q-slide-body">
+    <div class="q-header">
+      <div class="q-label">Q3 — July through September 2027</div>
+      <div class="rule"></div>
+      <div class="q-head">Art world re-entry. The summer sustained.</div>
+      <div class="q-subhead">Samuel Ross / SR_A (Creator) &nbsp;&middot;&nbsp; Tiffany &amp; Co. (Halo) &nbsp;&middot;&nbsp; Hidden NY (Accessible) &nbsp;&middot;&nbsp; Cart Dept. (Story)</div>
+    </div>
+    <div class="tier-rows">
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge creator">Creator</div>
+          <div class="tier-def">Fine art credential. Design world authority.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Samuel Ross</div>
+          <div class="tp-name-sub">SR_A Studio, London</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">A reinterpretation of Chamberlain's formal language through SR_A's brutalist industrial design vocabulary - a sculptural object, furniture edition, or spatial installation that processes Chamberlain's material logic through Ross's own idiom.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Samuel Ross MBE founded SR_A after A-COLD-WALL*. Partners: Apple, LVMH, Kohler, Zara. Works held at The Met, V&amp;A, and The Design Museum. First Virgil Abloh design assistant. His practice - abstraction, brutalism, deconstruction, "social architecture for the body" - is in close formal conversation with Chamberlain's compression and material ambition. Artistic Director of the 2025 London Design Biennale.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">Q3 2027<br>Summer / art fair season</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge halo">Halo</div>
+          <div class="tier-def">Luxury jewelry. Institutional fine art credibility.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Tiffany &amp; Co.</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">A centennial silver jewelry edition - sculptural sterling pieces referencing the compressed, torqued geometry of Chamberlain's steel works. Tiffany's history in architectural and sculptural jewelry makes this a coherent and prestigious extension of the centennial program.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Tiffany's recent cultural collaborations - including a Tiffany x Rimowa case (2023) and sustained LVMH-era cultural programming - demonstrate a genuine appetite for institutional partnerships that carry fine art credibility. A Chamberlain centennial silver edition positions the house within a serious art world narrative at the highest tier of the jewelry market.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">September 2027</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge access">Accessible</div>
+          <div class="tier-def">Discovery engine. Next-gen tastemaker.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Hidden NY</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">A web-drop centennial capsule with accompanying editorial - not just a product but a documented encounter with Chamberlain's work. Storytelling-first, limited run, community-focused. Hidden NY's format means the collaboration arrives with genuine narrative depth, not just a logo.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Hidden NY operates as a discovery and education engine for the next generation of culturally voracious consumers - the audience that finds things before anyone else. Their platforms function as the tastemaker layer: the place a younger collector encounters something before it becomes mainstream. A Chamberlain centennial drop here is an introduction, not a reminder.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">Q3 2027<br>Digital drop</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge story">Story</div>
+          <div class="tier-def">Archival depth. Next-gen collector education.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Cart Dept.</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">An archival storytelling partnership - Cart Dept. as the editorial and discovery engine that introduces Chamberlain's practice to an audience that finds things before anyone else. Deep-dive content, archival presentation, and centennial context delivered in the register next-gen collectors actually read.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Cart Dept. is a culturally credible archive and discovery platform built for the digitally native collector. A Chamberlain centennial partnership here is an introduction to a practice they may not yet know but are exactly primed to find compelling - delivered through trusted voices in the register those voices use. This is the editorial layer that makes the other drops make sense.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">Q3 2027<br>Editorial series</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span class="footer-credit">Prepared by temporary.company</span>
+    <span class="footer-nav"><button class="nav-btn" onclick="changeSlide(-1)">← Prev</button><button class="nav-btn" onclick="changeSlide(1)">Next →</button></span>
+    <span class="footer-num">6 / 8</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 6: Q4
+═══════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="q-slide-body">
+    <div class="q-header">
+      <div class="q-label">Q4 — October through December 2027</div>
+      <div class="rule"></div>
+      <div class="q-head">Collector season. The year's final argument.</div>
+      <div class="q-subhead">Bentley (Creator) &nbsp;&middot;&nbsp; Hot Wheels / Mattel Creations (Halo) &nbsp;&middot;&nbsp; Uniqlo UT (Accessible) &nbsp;&middot;&nbsp; Design Miami (Story)</div>
+    </div>
+    <div class="tier-rows">
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge creator">Creator</div>
+          <div class="tier-def">The ultimate automotive collaboration. Craft meets legacy.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Bentley</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">A limited centennial commission through Bentley Mulliner - a bespoke vehicle finished in a custom colorway and material referencing Chamberlain's steel palette, paired with a sculptural object or artwork created for the partnership. Salon Prive as the reveal context.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Bentley Mulliner's bespoke program has the craft vocabulary to engage with Chamberlain's formal language at the highest tier of automotive culture. Their collector clientele overlaps precisely with the serious fine art audience. Bentley has previously commissioned artist collaborations that treat the car as a cultural object - not simply a vehicle. The partnership closes the centennial with a genuinely prestigious automotive statement that honors the material origins of Chamberlain's practice.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">Q4 2027<br>Salon Prive</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge halo">Halo</div>
+          <div class="tier-def">The collector object. Secondary market currency.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Hot Wheels</div>
+          <div class="tp-name-sub">Mattel Creations</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">Limited edition centennial collector series - 1:64 die-cast vehicles referencing Chamberlain's crushed-steel aesthetic in premium display packaging. A holiday release positions this as the centennial's definitive collectible object - affordable, desirable, and unmistakably connected to Chamberlain's material origins.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Chamberlain's practice originated in crushed automotive steel - Hot Wheels are, literally, tiny versions of his material. The conceptual link is direct and requires no translation. Mattel Creations' Red Line Club and Elite 64 editions trade at multiples of retail on the secondary market. Their existing Daniel Arsham collaboration (the Livery Porsche 930A) provides a direct precedent and potential bridge to this program.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">Q4 2027<br>Holiday release</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge access">Accessible</div>
+          <div class="tier-def">Global reach. Maximum distribution. Every price point.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Uniqlo UT</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">UT graphic tee collection translating Chamberlain's steel surface photography and color fields into printable form. Global distribution across 2,400+ stores worldwide - the most democratic and scalable centennial touchpoint in the entire program.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Uniqlo's UT program has worked with artists from Andy Warhol to Louis de Guzman. Accessible price point removes every barrier to entry. Global physical distribution means Chamberlain's centennial reaches places that no gallery show, editorial, or digital campaign can replicate. This is the program's widest net - timed to holiday season for maximum reach.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">Q4 2027<br>Holiday season global launch</div>
+        </div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-name-col">
+          <div class="tier-badge story">Story</div>
+          <div class="tier-def">Design world capstone. The centennial's final chapter.</div>
+        </div>
+        <div class="tier-main-col">
+          <div class="tp-name">Design Miami</div>
+          <div class="tp-col-label">Concept</div>
+          <div class="tp-text">A year-end cultural capstone - Chamberlain centennial presence at Design Miami, the definitive annual meeting point of design, art, and collecting. A presentation, partnership, or installation that closes the centennial year with institutional design world authority and collector-facing gravitas.</div>
+        </div>
+        <div class="tier-why-col">
+          <div class="tp-col-label">Why It Works</div>
+          <div class="tp-text">Design Miami draws the most concentrated gathering of serious design collectors, curators, and institutions in the world each December. A centennial presence here - timed to the program's final major release - positions the year's work within the permanent record of design history rather than the ephemeral cycle of cultural marketing. The right place to land the centennial's final argument.</div>
+        </div>
+        <div class="tier-timing-col">
+          <div class="tp-col-label">Timing</div>
+          <div class="tp-text dark">December 2027<br>Design Miami</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span class="footer-credit">Prepared by temporary.company</span>
+    <span class="footer-nav"><button class="nav-btn" onclick="changeSlide(-1)">← Prev</button><button class="nav-btn" onclick="changeSlide(1)">Next →</button></span>
+    <span class="footer-num">7 / 8</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 7: CLOSING
+═══════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="slide-body">
+    <div class="eyebrow">Next Steps</div>
+    <div class="rule" style="max-width:700px"></div>
+    <div class="closing-quote">"In finding your place in sculpture, you need to find the material that offers you just the right resistance."</div>
+    <div class="closing-attr">— John Chamberlain, via Gagosian</div>
+    <p class="closing-body">Twelve months. Four tiers. The centennial becomes a sustained cultural argument rather than a single institutional event - each quarter building on the last, reaching new audiences without abandoning the ones already paying attention.</p>
+    <div class="closing-table">
+      <div class="c-row">
+        <div class="c-q">Q1</div>
+        <div class="c-text">Playlab (Creator) &nbsp;&middot;&nbsp; Rimowa (Halo) &nbsp;&middot;&nbsp; Supreme (Accessible) &nbsp;&middot;&nbsp; FAT Racing (Story)</div>
+      </div>
+      <div class="c-row">
+        <div class="c-q">Q2 ★</div>
+        <div class="c-text">Sterling Ruby (Creator) &nbsp;&middot;&nbsp; Alessi (Halo) &nbsp;&middot;&nbsp; 424 (Accessible) &nbsp;&middot;&nbsp; VCARB / Racing Bulls F1 (Story)</div>
+      </div>
+      <div class="c-row">
+        <div class="c-q">Q3</div>
+        <div class="c-text">Samuel Ross / SR_A (Creator) &nbsp;&middot;&nbsp; Tiffany &amp; Co. (Halo) &nbsp;&middot;&nbsp; Hidden NY (Accessible) &nbsp;&middot;&nbsp; Cart Dept. (Story)</div>
+      </div>
+      <div class="c-row">
+        <div class="c-q">Q4</div>
+        <div class="c-text">Bentley (Creator) &nbsp;&middot;&nbsp; Hot Wheels / Mattel Creations (Halo) &nbsp;&middot;&nbsp; Uniqlo UT (Accessible) &nbsp;&middot;&nbsp; Design Miami (Story)</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span class="footer-credit">Prepared by temporary.company</span>
+    <span class="footer-nav"><button class="nav-btn" onclick="changeSlide(-1)">← Prev</button><button class="nav-btn" onclick="changeSlide(1)">Next →</button></span>
+    <span class="footer-num">8 / 8</span>
+  </div>
+</div>
+
+</div><!-- /slides -->
+<script>
+  const isMobile = () => window.innerWidth <= 767;
+  let current = 0;
+  const slides = document.querySelectorAll('.slides > .slide');
+  const total = slides.length;
+
+  function updateProgress() {
+    if (!isMobile()) document.getElementById('progress').style.width = ((current+1)/total*100)+'%';
+  }
+  function goTo(n) {
+    if (isMobile()) return;
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(total-1, n));
+    slides[current].classList.add('active');
+    updateProgress();
+  }
+  function changeSlide(dir) { goTo(current+dir); }
+  document.addEventListener('keydown', e => {
+    if (isMobile()) return;
+    if (e.key==='ArrowRight'||e.key==='ArrowDown') changeSlide(1);
+    if (e.key==='ArrowLeft'||e.key==='ArrowUp') changeSlide(-1);
+  });
+  let startX = 0;
+  document.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    if (isMobile()) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 50) changeSlide(dx < 0 ? 1 : -1);
+  });
+  function initMobile() {
+    if (isMobile()) slides.forEach(s => { s.style.opacity='1'; s.style.pointerEvents='all'; s.style.position='static'; });
+  }
+  window.addEventListener('resize', () => {
+    if (isMobile()) initMobile();
+    else { slides.forEach(s => { s.style.opacity=''; s.style.pointerEvents=''; s.style.position=''; }); goTo(current); }
+  });
+  initMobile();
+  updateProgress();
+</script>
+</body>
+</html>
